@@ -32,6 +32,15 @@ body:
       value: "A bug happened!"
     validations:
       required: true
+  - type: textarea
+    id: JIRA Details
+    attributes:
+      label: JIRA
+      description: Enter the jira details
+      placeholder: ex. JIRA-1234
+      value: "!"
+    validations:
+      required: true
   - type: dropdown
     id: version
     attributes:
