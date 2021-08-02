@@ -1,14 +1,15 @@
-name: Bug Report
-description: File a bug report
-title: "[Bug]: "
-labels: [bug, triage]
-assignees:
-  - octocat
+---
+name: Backlog
+about: Describe this issue template's purpose here.
+title: ''
+labels: ''
+assignees: ''
+---
 body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to fill out this bug report!
+        Thanks for taking the time to create a User Story!
   - type: input
     id: contact
     attributes:
