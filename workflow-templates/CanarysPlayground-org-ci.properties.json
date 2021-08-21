@@ -1,6 +1,6 @@
 {
-    "name": "CanarysPlayground Org Workflow",
-    "description": "Octo Organization CI workflow template.",
+    "name": "Playground Template",
+    "description": "Canarys Playground CI workflow template.",
     "iconName": "example-icon",
     "categories": [
         "Go"
