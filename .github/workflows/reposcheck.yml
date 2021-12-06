@@ -17,4 +17,4 @@ jobs:
         name: ${{ github.workflow }}
         
     - name: Get Repo names
-      run: echo $GITHUB_REF
+      run: echo $GITHUB_REPOSITORY
