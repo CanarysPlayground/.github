@@ -16,5 +16,5 @@ jobs:
         run_id: ${{ github.run_id }}
         name: ${{ github.workflow }}
         
-     - name: Get Repo names
-       run: echo $GITHUB_REF
+    - name: Get Repo names
+      run: echo $GITHUB_REF
