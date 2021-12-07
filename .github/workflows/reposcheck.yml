@@ -1,11 +1,11 @@
-name: centrally managed workflow
+name: commit-message-checker
 
 on:
   repository_dispatch:
     types: [org-workflow-bot]
 
 jobs:
-  test-job:
+  commit-message-check:
     runs-on: ubuntu-latest
     steps:
     - uses: SvanBoxel/organization-workflow@main
@@ -16,9 +16,23 @@ jobs:
         run_id: ${{ github.run_id }}
         name: ${{ github.workflow }}
      
-    - name: Checkout
-      uses: actions/checkout@v2.3.4
+    - name: Get PR Commits
+      id: 'get-pr-commits'
+      uses: tim-actions/get-pr-commits@master
       with:
-        repository: ${{ github.event.client_payload.repository.full_name }}
-        ref: ${{ github.event.client_payload.sha }}
-        token: ${{ github.event.client_payload.token }}
+        token: ${{ secrets.GITHUB_TOKEN }}
+          
+    - name: Check Witems
+      if: ${{ success() || failure() }}
+      uses: tim-actions/commit-message-checker-with-regex@v0.3.1
+      with:
+        commits: ${{ steps.get-pr-commits.outputs.commits }}
+        pattern: 'AB\#[0-9]+'
+        error: 'No Work Items are linked'
+        one_pass_all_pass: 'true'
+        
+#     - name: Get Pull Request ID
+#       run: |
+#        export PR_NUMBER=$(echo $GITHUB_REF | awk 'BEGIN { FS = "/" } ; { print $3 }')
+#        echo "pr_num=$PR_NUMBER" >> $GITHUB_ENV
+#       shell: bash
