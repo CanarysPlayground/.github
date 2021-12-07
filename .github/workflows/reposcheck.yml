@@ -15,21 +15,28 @@ jobs:
         sha: ${{ github.event.client_payload.sha }}
         run_id: ${{ github.run_id }}
         name: ${{ github.workflow }}
+        
+    - name: Checkout
+      uses: actions/checkout@v2.3.4
+      with:
+        repository: ${{ github.event.client_payload.repository.full_name }}
+        ref: ${{ github.event.client_payload.sha }}
+        token: ${{ github.event.client_payload.token }}
      
-    - name: Get PR Commits
-      id: 'get-pr-commits'
-      uses: tim-actions/get-pr-commits@master
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
+#     - name: Get PR Commits
+#       id: 'get-pr-commits'
+#       uses: tim-actions/get-pr-commits@master
+#       with:
+#         token: ${{ secrets.GITHUB_TOKEN }}
           
-    - name: Check Witems
-      if: ${{ success() || failure() }}
-      uses: tim-actions/commit-message-checker-with-regex@v0.3.1
-      with:
-        commits: ${{ steps.get-pr-commits.outputs.commits }}
-        pattern: 'AB\#[0-9]+'
-        error: 'No Work Items are linked'
-        one_pass_all_pass: 'true'
+#     - name: Check Witems
+#       if: ${{ success() || failure() }}
+#       uses: tim-actions/commit-message-checker-with-regex@v0.3.1
+#       with:
+#         commits: ${{ steps.get-pr-commits.outputs.commits }}
+#         pattern: 'AB\#[0-9]+'
+#         error: 'No Work Items are linked'
+#         one_pass_all_pass: 'true'
         
 #     - name: Get Pull Request ID
 #       run: |
