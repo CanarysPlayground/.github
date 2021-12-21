@@ -1,0 +1,12 @@
+version: 2
+mergeable:
+  - when: pull_request.*, pull_request_review.*
+    validate:
+      - do: commit
+        message:
+          regex: 'AB\#[0-9]+'
+          message: 'The Azure ticket does not exist'          
+
+    pass:
+      - do: checks
+        status: 'success'
