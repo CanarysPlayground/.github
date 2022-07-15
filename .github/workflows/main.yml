@@ -29,4 +29,4 @@ jobs:
           destination-github-username: 'CanarysPlayground'
           destination-repository-name: 'test-rules'
           user-email: noreply@github.com
-          target-branch: master
+          target-branch: main
