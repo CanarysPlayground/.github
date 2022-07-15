@@ -26,7 +26,6 @@ jobs:
           API_TOKEN_GITHUB: ${{ secrets.PAT_TOKEN }}
         with:
           source-directory: '.github/ISSUE_TEMPLATE'
-          destination-github-username: 'CanarysPlayground'
           destination-repository-name: 'CanarysPlayground/test-version'
           user-email: noreply@github.com
           target-branch: main
