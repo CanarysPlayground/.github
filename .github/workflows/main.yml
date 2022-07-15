@@ -27,6 +27,6 @@ jobs:
           source-directory: '.github/ISSUE_TEMPLATE'
           target-directory: '.github/ISSUE_TEMPLATE'
           destination-github-username: 'CanarysPlayground'
-          destination-repository-name: 'Ramesh-deepspace'
+          destination-repository-name: 'test-rules'
           user-email: noreply@github.com
           target-branch: master
