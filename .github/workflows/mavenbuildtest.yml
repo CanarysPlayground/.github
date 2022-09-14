@@ -216,14 +216,14 @@ jobs:
 #           cd ${{github.workspace}}/pages-docs
 #           ls -ltr
           
-      - name: Deploy to GitHub Pages
-        if: ${{inputs.jacocotest == 'true'}}
-        uses: crazy-max/ghaction-github-pages@v3
-        with:
-          target_branch: gh-pages
-          build_dir: pages-docs
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#       - name: Deploy to GitHub Pages
+#         if: ${{inputs.jacocotest == 'true'}}
+#         uses: crazy-max/ghaction-github-pages@v3
+#         with:
+#           target_branch: gh-pages
+#           build_dir: pages-docs
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
       - name: Publish Test Results
         uses: EnricoMi/publish-unit-test-result-action@v1
