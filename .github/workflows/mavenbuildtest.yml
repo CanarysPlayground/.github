@@ -208,13 +208,13 @@ jobs:
       - name: Build with Maven
         run: mvn --batch-mode --update-snapshots package -Dmaven.test.failure.ignore=true
      
-      - name: Copy Jacoco files
-        if: ${{inputs.jacocotest == 'true'}}
-        run: |
-          jacoco_file_stat=${{github.workspace}}/target/site/jacoco
-          sudo cp -R ${{github.workspace}}/target/site/jacoco ${{github.workspace}}/pages-docs
-          cd ${{github.workspace}}/pages-docs
-          ls -ltr
+#       - name: Copy Jacoco files
+#         if: ${{inputs.jacocotest == 'true'}}
+#         run: |
+#           jacoco_file_stat=${{github.workspace}}/target/site/jacoco
+#           sudo cp -R ${{github.workspace}}/target/site/jacoco ${{github.workspace}}/pages-docs
+#           cd ${{github.workspace}}/pages-docs
+#           ls -ltr
           
       - name: Deploy to GitHub Pages
         if: ${{inputs.jacocotest == 'true'}}
