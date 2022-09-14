@@ -1,0 +1,315 @@
+name: Maven Build
+
+on:
+  workflow_call:
+   inputs:
+     gh-pagesurl:
+       required: false
+       type: string
+    #  azureartifactname:
+    #    required: true
+    #    type: string
+     sourcebranch:
+       required: true
+       type: string
+     developmentbranch:
+       required: false
+       type: string
+       default: development
+     team_reviewers:
+       required: false
+       type: string
+     mainbranch:
+       required: false
+       default: master
+       type: string
+#      settingsxml:
+#        required: true
+#        default: false
+#        type: string
+     createartifact:
+       default: false
+       required: false
+       type: string
+     BuildArtifactSourcePath:
+       default: .
+       required: false
+       type: string
+     runstep:
+       default: false
+       required: false
+       type: string
+     command:
+       default: .
+       required: false
+       type: string
+     jacocotest:
+       default: false
+       required: false
+       type: string
+     unittest-surefire:
+       default: false
+       required: false
+       type: string
+     multimoduleproject:
+       default: false
+       required: false
+       type: string
+     java-version:
+       required: true
+       type: string
+     distribution:
+       required: true
+       type: string
+       
+   outputs:
+     version: 
+       description: "gitversion output"
+       value: ${{ jobs.build.outputs.version }}
+     Pre-release-tag:
+       value: ${{ jobs.build.outputs.Pre-release-tag }}
+     projectversion: 
+       description: "Project Version Output"
+       value: ${{ jobs.build.outputs.projectversion}}
+jobs:  
+ build:
+    name: ⚒️ Build
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.gitversion.outputs.semVer }}
+      projectversion: ${{ steps.project-version.outputs.version}}
+      Pre-release-tag: ${{ steps.gitversion.outputs.preReleaseTag }}
+    environment:
+      name: github-pages
+      url: ${{inputs.gh-pagesurl}}
+    steps:
+      - run: |
+         echo ${{github.ref}}
+         echo ${{github.base_ref}}
+      
+      - name: Get Token
+        id: get_workflow_token
+        uses: peter-murray/workflow-application-token-action@v1
+        with:
+          application_id: ${{ secrets.APPLICATION_ID }}
+          application_private_key: ${{ secrets.APPLICATION_PRIVATE_KEY }}
+      
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ssh-key: ${{secrets.DEPLOY_KEY}}
+          
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: ${{inputs.java-version}}
+          distribution: ${{inputs.distribution}}
+          
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v0.9.7
+        with:
+         versionSpec: '5.x'
+
+      - name: Determine Version
+        id: gitversion
+        uses: gittools/actions/gitversion/execute@v0.9.7
+        with:
+          useConfigFile: true
+          configFilePath: gitversion.yml
+
+      - name: update maven version
+        run: |
+            echo "Major: ${{ steps.gitversion.outputs.major }}"
+            echo "Minor: ${{ steps.gitversion.outputs.minor }}"
+            echo "Patch: ${{ steps.gitversion.outputs.patch }}"
+            echo "PreReleaseTag: ${{ steps.gitversion.outputs.preReleaseTag }}"
+            echo "PreReleaseTagWithDash: ${{ steps.gitversion.outputs.preReleaseTagWithDash }}"
+            echo "PreReleaseLabel: ${{ steps.gitversion.outputs.preReleaseLabel }}"
+            echo "PreReleaseNumber: ${{ steps.gitversion.outputs.preReleaseNumber }}"
+            echo "WeightedPreReleaseNumber: ${{ steps.gitversion.outputs.weightedPreReleaseNumber }}"
+            echo "BuildMetaData: ${{ steps.gitversion.outputs.buildMetaData }}"
+            echo "BuildMetaDataPadded: ${{ steps.gitversion.outputs.buildMetaDataPadded }}"
+            echo "FullBuildMetaData: ${{ steps.gitversion.outputs.fullBuildMetaData }}"
+            echo "MajorMinorPatch: ${{ steps.gitversion.outputs.majorMinorPatch }}"
+            echo "SemVer: ${{ steps.gitversion.outputs.semVer }}"
+            echo "LegacySemVer: ${{ steps.gitversion.outputs.legacySemVer }}"
+            echo "LegacySemVerPadded: ${{ steps.gitversion.outputs.legacySemVerPadded }}"
+            echo "AssemblySemVer: ${{ steps.gitversion.outputs.assemblySemVer }}"
+            echo "AssemblySemFileVer: ${{ steps.gitversion.outputs.assemblySemFileVer }}"
+            echo "FullSemVer: ${{ steps.gitversion.outputs.fullSemVer }}"
+      
+      - name: Run command
+        if: ${{inputs.runstep == 'true'}}
+        run: |
+         ${{inputs.command}}
+      
+      # - name: Generate Settings.xml
+      #   if: ${{inputs.settingsxml == 'true'}} 
+      #   uses: whelk-io/maven-settings-xml-action@v20
+      #   with:
+      #    servers: >
+      #       [
+      #         {
+      #             "id": "java-store",
+      #             "username": "wibmo-artifacts",
+      #             "password": "${{secrets.AZURE_DEVOPS_TOKEN}}"
+      #         },
+      #         {
+      #             "id": "java-store-thirdparty",
+      #             "username": "wibmo-artifacts",
+      #             "password": "${{secrets.AZURE_DEVOPS_TOKEN}}"
+      #         }
+      #       ]
+      #    repositories: |
+      #       [
+      #         {
+      #           "id": "java-store",
+      #           "name": "Azure DevOps",
+      #           "url": "https://pkgs.dev.azure.com/wibmo-artifacts/artifacts-storage/_packaging/java-store/maven/v1"
+      #         },
+      #         {	  
+      #           "id": "java-store-thirdparty",
+      #           "name": "Azure Artifacts Third Party",
+      #           "url": "https://pkgs.dev.azure.com/wibmo-artifacts/artifacts-storage/_packaging/java-store-thirdparty/maven/v1"
+      #         }
+      #       ]
+      
+      - run: cat /home/runner/.m2/settings.xml
+      - name: Cache the Maven packages to speed up build
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+     
+      
+      - name: Check Project Version
+        id: project-version
+        env:
+          project_git_version: ${{steps.gitversion.outputs.majorMinorPatch}}
+        run: |
+          project_version=$(mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout)
+          echo $project_version
+          echo $project_git_version
+          if [ ${project_version} == ${project_git_version} ]; then
+             echo "::set-output name=version::1"
+          else
+             echo "::set-output name=version::0"
+             echo "Update Project Version"
+           fi 
+      
+      - run: |
+         mvn versions:set -DnewVersion=${{ steps.gitversion.outputs.majorMinorPatch }}
+      
+      - name: Update versions in all modules
+        if: ${{inputs.multimoduleproject == 'true'}}
+        run: mvn versions:set -DnewVersion=${{ steps.gitversion.outputs.majorMinorPatch }} -DprocessAllModules
+      
+      - name: Build with Maven
+        run: mvn --batch-mode --update-snapshots package -Dmaven.test.failure.ignore=true
+     
+      - name: Copy Jacoco files
+        if: ${{inputs.jacocotest == 'true'}}
+        run: |
+          jacoco_file_stat=${{github.workspace}}/target/site/jacoco
+          sudo cp -R ${{github.workspace}}/target/site/jacoco ${{github.workspace}}/pages-docs
+          cd ${{github.workspace}}/pages-docs
+          ls -ltr
+          
+      - name: Deploy to GitHub Pages
+        if: ${{inputs.jacocotest == 'true'}}
+        uses: crazy-max/ghaction-github-pages@v3
+        with:
+          target_branch: gh-pages
+          build_dir: pages-docs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v1
+        if: ${{inputs.unittest-surefire == 'true'}}
+        with:
+         files: ${{github.workspace}}/target/surefire-reports/TEST-*.xml  
+      
+      - name: Upload a Build Artifact
+        if: ${{inputs.createartifact == 'true'}}
+        uses: actions/upload-artifact@v3.1.0
+        with:
+          # Artifact name
+          name: Build Artifacts
+          path:  ${{ inputs.BuildArtifactSourcePath}}
+          retention-days: 30
+     
+      - name: Update POM Version in Repository
+        if: (steps.project-version.outputs.version == 0 && contains(github.ref, inputs.developmentbranch))
+        env:
+         gitversionoutput: ${{steps.project-version.outputs.version}}
+        run: |
+              git config --global user.name github-bot_canarys
+              git config --global user.email noreply@github.com
+              git add pom.xml
+              git commit -m "update version in pom.xml"
+              git push
+      
+      - name: Update POM Version in All Modules
+        if: (steps.project-version.outputs.version == 0 && contains(github.ref, inputs.sourcebranch) && inputs.multimoduleproject == 'true')
+        env:
+         gitversionoutput: ${{steps.project-version.outputs.version}}
+        run: |
+              git config --global user.name github-bot_wibmo
+              git config --global user.email noreply@github.com
+              git ls-files . | grep 'pom.xml$' | xargs git add
+              git commit -m "update versions in pom.xml of submodules"
+              git push
+      
+      - name: Get SHA value
+        if: contains(github.ref, 'refs/heads/release') || contains(github.ref, 'refs/heads/master')
+        id: shaoutput
+        run: |
+           echo "::set-output name=sha::$(git rev-parse HEAD)"
+      
+      - name: Create a Pull Request
+        if: (contains(github.ref, 'refs/heads/release') && (github.event_name != 'create'))
+        id: open-release-pr
+        uses: repo-sync/pull-request@v2
+        with:
+            source_branch: ${{github.ref}}                               
+            destination_branch: ${{inputs.developmentbranch}}                      
+            pr_title: "Pulling ${{github.ref}} into ${{inputs.developmentbranch}}" 
+            pr_body: ":crown: *An automated PR*"
+            github_token: ${{ steps.get_workflow_token.outputs.token }}
+            sha: ${{steps.shaoutput.outputs.sha}}    
+        continue-on-error: true
+        
+      - name: Create a Pull Request
+        id: open-master-pr
+        if: contains(github.ref, 'refs/heads/master')
+        uses: repo-sync/pull-request@v2
+        with:
+            source_branch: ${{github.ref}}                                
+            destination_branch: ${{inputs.developmentbranch}}                         
+            pr_title: "Pulling ${{github.ref}} into ${{inputs.developmentbranch}}" 
+            pr_body: ":crown: *An automated PR*"
+            github_token: ${{ steps.get_workflow_token.outputs.token }}
+            sha: ${{steps.shaoutput.outputs.sha}}   
+        continue-on-error: true
+  
+      - name: Assign a Reviewer
+        if: contains(github.ref, 'refs/heads/master')
+        uses: octokit/request-action@v2.1.0
+        env:
+         GITHUB_TOKEN: ${{ steps.get_workflow_token.outputs.token }}
+         INPUT_TEAM_REVIEWERS: ${{inputs.team_reviewers}}
+        with:
+         route: POST /repos/${{github.repository}}/pulls/${{steps.open-master-pr.outputs.pr_number}}/requested_reviewers
+        continue-on-error: true
+     
+      - name: Assign a Reviewer
+        if: (contains(github.ref, 'refs/heads/release') && (github.event_name != 'create'))
+        uses: octokit/request-action@v2.1.0
+        env:
+         GITHUB_TOKEN: ${{ steps.get_workflow_token.outputs.token }}
+         INPUT_TEAM_REVIEWERS: ${{inputs.team_reviewers}}
+        with:
+         route: POST /repos/${{github.repository}}/pulls/${{steps.open-release-pr.outputs.pr_number}}/requested_reviewers
+        continue-on-error: true
