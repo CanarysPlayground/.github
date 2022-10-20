@@ -6,7 +6,7 @@ name: CI-Reusable
 on:
   workflow_call:
     inputs:
-      repository:
+      repo:
         required: true
         type: string
 
@@ -17,5 +17,5 @@ jobs:
     steps:
     - uses: actions/checkout@v2
       with:
-        repository: ${{ inputs.repository }}
+        repository: ${{ inputs.repo }}
         token: ${{secrets.TOKEN}}
