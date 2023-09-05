@@ -15,6 +15,13 @@ jobs:
       - name: Execute the script
         run: |
          node git-audit.js canarys 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
+
+      - run: |
+         cp *.csv git-audit-logs/
+         git add .
+         git config user.mail vaishnav.nugala@ecanarys.com
+         git commit -m "new report added"
+         git push https://${{secrets.GITHUB_TOKEN}}@github.com/CanarysPlayground/.github
       - uses: actions/upload-artifact@v3
         with:
           name: my-artifact
