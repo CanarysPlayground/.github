@@ -1,9 +1,15 @@
 
 const fs = require('fs');
 const fetch = require('node-fetch');
+
 const accessToken = process.argv[3];
+
 const enterprise = process.argv[2];
-const csvFilePath = 'git_audit_log_report.csv';
+
+
+const now = new Date();
+const timestamp = now.toISOString().replace(/:/g, '-').replace(/\./g, '-');
+const csvFilePath = `git_audit_log_report_${timestamp}.csv`;
 
 async function gitauditlogevents (page){
     page = 1;
