@@ -14,9 +14,9 @@ jobs:
          npm install fs node-fetch@2    
       - name: Execute the script
         run: |
-         node gitaudit.js canarys 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
+         node git-audit.js canarys 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
       - uses: actions/upload-artifact@v3
         with:
           name: my-artifact
-          path: /*.csv
+          path: ${{github.workspace}}/*.csv
         
