@@ -7,14 +7,14 @@ on:
         required: true
         type: string
       app-name:
-        required: true
+        required: false
         type: string
       publish-profile-dev:
-        required: true
+        required: false
         type: string
         description: Base64 encoded publish profile for the dev slot
       publish-profile-prod:
-        required: true
+        required: false
         type: string
         description: Base64 encoded publish profile for the production slot
       working-directory:
