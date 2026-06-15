@@ -1,25 +1,36 @@
-name: "🤖 Agentic Issue Initiation"
-description: "Standardized initiation. Enter an ID, and Copilot will dynamically format the title and body."
-title: "[PENDING ID]: Enter Your Requirement ID to Begin" # Place-holder title
-labels: ["status: backlog", "source: agentic-copilot"]
+name: "🤖 Identity & Lifecycle Auditor"
+description: "Hyper-efficient organization and profile metadata audit using live REST APIs."
+title: "<Auto Generated>"
+
+labels: ["status: audited", "source: enterprise-copilot"]
+assignees: 
+  - "$author" # Native GitHub shortcut: automatically assigns the issue creator
+projects:
+  - "orgs/CanarysPlayground/projects/356"
+
 body:
-  - type: input
-    id: tracking-id
+  - type: markdown
     attributes:
-      label: "Requirement ID"
-      placeholder: "e.g., 1, 2, 3..."
+      value: |
+        *Cost-optimized automation route active.*
+
+  - type: input
+    id: hidden-context
+    attributes:
+      label: "System Audit Metadata"
+      value: "Org: ${{ github.repository_owner }} | Auditor: @${{ github.actor }}"
     validations:
       required: true
 
   - type: textarea
     id: copilot-trigger
     attributes:
-      label: "Copilot Generation Command"
+      label: "Optimized AI Formatting Field"
       value: |
-        @copilot Read the Requirement ID provided. 
-        1. Fetch data from `https://typicode.com{ID}`.
-        2. Extract the 'title' parameter from the API JSON response.
-        3. DYNAMIC TITLE REQUIREMENT: You MUST rewrite the main GitHub Issue Title field at the top of this page to match this format exactly: `[REQ-{ID}]: {API_JSON_TITLE}`.
-        4. Reformat the issue body into a standard deployment checklist.
+        @copilot 
+        1. Fetch JSON from: `https://github.com{{ github.repository_owner }}`
+        2. Fetch JSON from: `https://github.com{{ github.actor }}`
+        3. Rewrite the title bar to: `[AI Generated Issue]: ${{ github.repository_owner }} / @${{ github.actor }}`
+        4. Reformat response profiles into clean Markdown grid tables below. Keep it concise.
     validations:
       required: true
