@@ -1,0 +1,25 @@
+name: "🤖 Agentic Issue Initiation"
+description: "Standardized initiation. Enter an ID, and Copilot will dynamically format the title and body."
+title: "[PENDING ID]: Enter Your Requirement ID to Begin" # Place-holder title
+labels: ["status: backlog", "source: agentic-copilot"]
+body:
+  - type: input
+    id: tracking-id
+    attributes:
+      label: "Requirement ID"
+      placeholder: "e.g., 1, 2, 3..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: copilot-trigger
+    attributes:
+      label: "Copilot Generation Command"
+      value: |
+        @copilot Read the Requirement ID provided. 
+        1. Fetch data from `https://typicode.com{ID}`.
+        2. Extract the 'title' parameter from the API JSON response.
+        3. DYNAMIC TITLE REQUIREMENT: You MUST rewrite the main GitHub Issue Title field at the top of this page to match this format exactly: `[REQ-{ID}]: {API_JSON_TITLE}`.
+        4. Reformat the issue body into a standard deployment checklist.
+    validations:
+      required: true
